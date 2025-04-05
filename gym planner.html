@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1E1E1E, #2D2D2D);
+            color: #FFD700;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .container {
+            margin-top: 50px;
+            position: relative;
+            z-index: 2;
+        }
+        .title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .theme-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+        }
+        .day-buttons button {
+            border-radius: 50px;
+            margin: 5px;
+        }
+        .floating-bg {
+            position: absolute;
+            opacity: 0.2;
+            z-index: 1;
+        }
+        .floating-bg img {
+            width: 100px;
+            height: 100px;
+            animation: float 10s infinite ease-in-out;
+        }
+        .exercise-box {
+            background-color: #333;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .exercise-box input {
+            border-radius: 50px;
+        }
+        .exercise-box button {
+            border-radius: 50px;
+        }
+        .exercise-category {
+            margin-top: 20px;
+        }
+        .exercise-category h5 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .exercise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #444;
+            color: #FFD700;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-bg" style="top: 10%; left: 20%;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3595/3595582.png" alt="Dumbbell">
+    </div>
+    <div class="floating-bg" style="top: 50%; left: 10%;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3595/3595582.png" alt="Dumbbell">
+    </div>
+    <div class="floating-bg" style="top: 30%; left: 70%;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3595/3595582.png" alt="Dumbbell">
+    </div>
+
+    <button class="btn btn-warning theme-btn">Change Theme</button>
+
+    <div class="container">
+        <h1 class="title">Gym Planner</h1>
+
+        <div class="text-center day-buttons">
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Monday">Monday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Tuesday">Tuesday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Wednesday">Wednesday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Thursday">Thursday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Friday">Friday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Saturday">Saturday</button>
+            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#plannerModal" data-day="Sunday">Sunday</button>
+        </div>
+
+        <div class="exercise-box mt-4">
+            <h4 class="text-center">Select Body Part</h4>
+            <div class="d-grid gap-2">
+                <button class="btn btn-secondary body-part" data-category="Chest">Chest</button>
+                <button class="btn btn-secondary body-part" data-category="Back">Back</button>
+                <button class="btn btn-secondary body-part" data-category="Shoulders">Shoulders</button>
+                <button class="btn btn-secondary body-part" data-category="Biceps">Biceps</button>
+                <button class="btn btn-secondary body-part" data-category="Triceps">Triceps</button>
+                <button class="btn btn-secondary body-part" data-category="Legs">Legs</button>
+                <button class="btn btn-secondary body-part" data-category="Abs">Abs</button>
+            </div>
+        </div>
+
+        <div class="exercise-category" id="exerciseList"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="plannerModal" tabindex="-1" aria-labelledby="plannerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="plannerModalLabel">Planner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="modalDay"></h6>
+                    <div id="plannerContent">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const planner = {};
+
+        const exercises = {
+            Chest: ["Bench Press", "Incline Bench Press", "Chest Fly", "Push-Ups"],
+            Back: ["Pull-Ups", "Deadlift", "Barbell Rows", "Lat Pulldowns"],
+            Shoulders: ["Overhead Press", "Lateral Raises", "Front Raises", "Arnold Press"],
+            Biceps: ["Bicep Curls", "Hammer Curls", "Preacher Curls"],
+            Triceps: ["Tricep Dips", "Overhead Tricep Extensions", "Close-Grip Bench Press"],
+            Legs: ["Squats", "Lunges", "Leg Press", "Deadlifts"],
+            Abs: ["Plank", "Sit-Ups", "Russian Twists", "Leg Raises"]
+        };
+
+        document.querySelectorAll('.btn-dark[data-bs-target="#plannerModal"]').forEach(button => {
+            button.addEventListener('click', event => {
+                const day = event.target.getAttribute('data-day');
+                document.getElementById('modalDay').textContent = `Planner: ${day}`;
+
+                const content = planner[day] || [];
+                const plannerContent = document.getElementById('plannerContent');
+                plannerContent.innerHTML = '';
+
+                content.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.innerHTML = `<h6>${category.name}</h6>`;
+
+                    category.exercises.forEach(exercise => {
+                        const exerciseDiv = document.createElement('div');
+                        exerciseDiv.textContent = exercise;
+                        exerciseDiv.classList.add('exercise-item');
+                        categoryDiv.appendChild(exerciseDiv);
+                    });
+
+                    plannerContent.appendChild(categoryDiv);
+                });
+            });
+        });
+
+        document.querySelectorAll('.body-part').forEach(button => {
+            button.addEventListener('click', event => {
+                const categoryName = event.target.getAttribute('data-category');
+                const exerciseListDiv = document.getElementById('exerciseList');
+                exerciseListDiv.innerHTML = `<h5>${categoryName}</h5>`;
+
+                exercises[categoryName].forEach(exercise => {
+                    const exerciseItemDiv = document.createElement('div');
+                    exerciseItemDiv.classList.add('exercise-item');
+                    exerciseItemDiv.innerHTML = `
+                        <span>${exercise}</span>
+                        <button class="btn btn-sm btn-success add-to-planner">+</button>
+                    `;
+
+                    exerciseItemDiv.querySelector('.add-to-planner').addEventListener('click', () => {
+                        const selectedDay = document.getElementById('modalDay').textContent.split(': ')[1];
+
+                        if (!planner[selectedDay]) planner[selectedDay] = [];
+                        let category = planner[selectedDay].find(cat => cat.name === categoryName);
+
+                        if (!category) {
+                            category = { name: categoryName, exercises: [] };
+                            planner[selectedDay].push(category);
+                        }
+
+                        if (!category.exercises.includes(exercise)) {
+                            category.exercises.push(exercise);
+                        }
+
+                        alert(`${exercise} added to ${selectedDay} under ${categoryName}!`);
+                    });
+
+                    exerciseListDiv.appendChild(exerciseItemDiv);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
